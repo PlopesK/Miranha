@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
 import HeroDetails from "../HeroDetails";
 import HeroPicture from "../HeroPicture";
@@ -12,6 +13,12 @@ import { IHeroData } from "@/interfaces/heroes";
 interface IProps {
   heroes: IHeroData[];
   activeId: string;
+}
+
+enum enPosition {
+  front = 0,
+  middle = 1,
+  back = 2,
 }
 
 export default function Carousel({ heroes, activeId }: IProps) {
@@ -61,11 +68,18 @@ export default function Carousel({ heroes, activeId }: IProps) {
           className={styles.wrapper}
           onClick={() => handleChangeActiveIndex(1)}
         >
-          {visibleItems?.map((item: IHeroData) => (
-            <div key={item.id} className={styles.hero}>
-              <HeroPicture hero={item} />
-            </div>
-          ))}
+          <AnimatePresence mode="popLayout">
+            {visibleItems?.map((item: IHeroData, position) => (
+              <motion.div
+                key={item.id}
+                className={styles.hero}
+                transition={{ duration: 0.8 }}
+                animate={{ ...getItemStyles(position) }}
+              >
+                <HeroPicture hero={item} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       </div>
       <div className={styles.details}>
@@ -74,3 +88,30 @@ export default function Carousel({ heroes, activeId }: IProps) {
     </div>
   );
 }
+
+const getItemStyles = (position: enPosition) => {
+  if (position === enPosition.front) {
+    return {
+      filter: "blur(10px)",
+      scale: 1.2,
+      zIndex: 3,
+    };
+  }
+  if (position === enPosition.middle) {
+    return {
+      left: 300,
+      scale: 0.8,
+      zIndex: 2,
+      top: "-10%",
+    };
+  }
+
+  return {
+    filter: "blur(10px)",
+    zIndex: 1,
+    scale: 0.6,
+    left: 160,
+    top: "-20%",
+    opacity: 0.8,
+  };
+};
