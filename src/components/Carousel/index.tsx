@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import HeroDetails from "../HeroDetails";
@@ -30,6 +30,20 @@ export default function Carousel({ heroes, activeId }: IProps) {
     heroes.findIndex((hero) => hero.id === activeId) - 1
   );
 
+  const transitionAudio = useMemo(() => new Audio("/songs/transition.mp3"), []);
+
+  const allVoicesAudio: Record<string, HTMLAudioElement> = useMemo(
+    () => ({
+      "spider-man-616": new Audio("/songs/spider-man-616.mp3"),
+      "mulher-aranha-65": new Audio("/songs/mulher-aranha-65.mp3"),
+      "spider-man-1610": new Audio("/songs/spider-man-1610.mp3"),
+      "sp-dr-14512": new Audio("/songs/sp-dr-14512.mp3"),
+      "spider-ham-8311": new Audio("/songs/spider-ham-8311.mp3"),
+      "spider-man-90214": new Audio("/songs/spider-man-90214.mp3"),
+      "spider-man-928": new Audio("/songs/spider-man-928.mp3"),
+    }),
+    []
+  );
   // Altera o visibleItems sempre que o activeIndex é alterado
   useEffect(() => {
     // itens que serão mostrados ao longo do carrossel
@@ -64,6 +78,23 @@ export default function Carousel({ heroes, activeId }: IProps) {
       htmlEl.classList.remove("hero-page");
     };
   }, [visibleItems]);
+
+  useEffect(() => {
+    if (!visibleItems) {
+      return;
+    }
+
+    transitionAudio.play();
+
+    const voiceAudio = allVoicesAudio[visibleItems[enPosition.middle].id];
+
+    if (!voiceAudio) {
+      return;
+    }
+
+    voiceAudio.volume = 0.3;
+    voiceAudio.play();
+  }, [visibleItems, transitionAudio, allVoicesAudio]);
 
   // Altera herói ativo no carrossel
   // +1 rotaciona no sentido horário
