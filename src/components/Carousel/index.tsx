@@ -30,6 +30,9 @@ export default function Carousel({ heroes, activeId }: IProps) {
     heroes.findIndex((hero) => hero.id === activeId) - 1
   );
 
+  const [startInteractionPosition, setStartInteractionPosition] =
+    useState<number>(0);
+
   const transitionAudio = useMemo(() => new Audio("/songs/transition.mp3"), []);
 
   const allVoicesAudio: Record<string, HTMLAudioElement> = useMemo(
@@ -103,6 +106,38 @@ export default function Carousel({ heroes, activeId }: IProps) {
     setActiveIndex((prevActiveIndex: number) => prevActiveIndex + newDirection);
   };
 
+  //Drag
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+    setStartInteractionPosition(e.clientX);
+  };
+  const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
+    if (!startInteractionPosition) {
+      return;
+    }
+
+    const endInteractionPosition = e.clientX;
+    const diffPosition = endInteractionPosition - startInteractionPosition;
+
+    const newPosition = diffPosition > 0 ? -1 : 1;
+    handleChangeActiveIndex(newPosition);
+  };
+
+  //Touch
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    setStartInteractionPosition(e.touches[0].clientX);
+  };
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!startInteractionPosition) {
+      return;
+    }
+
+    const endInteractionPosition = e.changedTouches[0].clientX;
+    const diffPosition = endInteractionPosition - startInteractionPosition;
+
+    const newPosition = diffPosition > 0 ? -1 : 1;
+    handleChangeActiveIndex(newPosition);
+  };
+
   if (!visibleItems) {
     return null;
   }
@@ -112,7 +147,10 @@ export default function Carousel({ heroes, activeId }: IProps) {
       <div className={styles.carousel}>
         <div
           className={styles.wrapper}
-          onClick={() => handleChangeActiveIndex(1)}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
         >
           <AnimatePresence mode="popLayout">
             {visibleItems?.map((item: IHeroData, position) => (
