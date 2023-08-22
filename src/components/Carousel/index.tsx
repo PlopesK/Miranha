@@ -27,7 +27,7 @@ export default function Carousel({ heroes, activeId }: IProps) {
 
   // Armazena o item ativo do carrossel
   const [activeIndex, setActiveIndex] = useState(
-    heroes.findIndex((hero) => hero.id === activeId)
+    heroes.findIndex((hero) => hero.id === activeId) - 1
   );
 
   // Altera o visibleItems sempre que o activeIndex é alterado
@@ -49,6 +49,21 @@ export default function Carousel({ heroes, activeId }: IProps) {
 
     setVisibleItems(visibleItems);
   }, [heroes, activeIndex]);
+
+  useEffect(() => {
+    const htmlEl = document.querySelector("html");
+    if (!htmlEl || !visibleItems) {
+      return;
+    }
+
+    const currentHeroId = visibleItems[enPosition.middle].id;
+    htmlEl.style.backgroundImage = `url('/spiders/${currentHeroId}-background.png')`;
+    htmlEl.classList.add("hero-page");
+
+    return () => {
+      htmlEl.classList.remove("hero-page");
+    };
+  }, [visibleItems]);
 
   // Altera herói ativo no carrossel
   // +1 rotaciona no sentido horário
@@ -74,7 +89,9 @@ export default function Carousel({ heroes, activeId }: IProps) {
                 key={item.id}
                 className={styles.hero}
                 transition={{ duration: 0.8 }}
-                animate={{ ...getItemStyles(position) }}
+                initial={{ x: -1500, scale: 0.8 }}
+                animate={{ x: 0, ...getItemStyles(position) }}
+                exit={{ x: 0, left: "-20%", opacity: 0, scale: 1 }}
               >
                 <HeroPicture hero={item} />
               </motion.div>
@@ -82,9 +99,14 @@ export default function Carousel({ heroes, activeId }: IProps) {
           </AnimatePresence>
         </div>
       </div>
-      <div className={styles.details}>
-        <HeroDetails data={heroes[0]} />
-      </div>
+      <motion.div
+        className={styles.details}
+        transition={{ delay: 1, duration: 2 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        <HeroDetails data={visibleItems[enPosition.middle]} />
+      </motion.div>
     </div>
   );
 }
