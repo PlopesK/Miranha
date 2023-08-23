@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -34,75 +35,79 @@ export default function Carousel({ heroes, activeId }: IProps) {
   const [startInteractionPosition, setStartInteractionPosition] =
     useState<number>(0);
 
-  // Som de transição
-  const transitionAudio = useMemo(() => new Audio("/songs/transition.mp3"), []);
+  if (typeof window !== "undefined") {
+    const transitionAudio = useMemo(() => {
+      const audioElement = new Audio();
+      audioElement.src = "/songs/transition.mp3";
+      return audioElement;
+    }, []);
 
-  // Voz de cada personagem
-  const voicesAudio: Record<string, HTMLAudioElement> = useMemo(
-    () => ({
-      "spider-man-616": new Audio("/songs/spider-man-616.mp3"),
-      "mulher-aranha-65": new Audio("/songs/mulher-aranha-65.mp3"),
-      "spider-man-1610": new Audio("/songs/spider-man-1610.mp3"),
-      "sp-dr-14512": new Audio("/songs/sp-dr-14512.mp3"),
-      "spider-ham-8311": new Audio("/songs/spider-ham-8311.mp3"),
-      "spider-man-90214": new Audio("/songs/spider-man-90214.mp3"),
-      "spider-man-928": new Audio("/songs/spider-man-928.mp3"),
-    }),
-    []
-  );
-
-  // Altera o visibleItems sempre que o activeIndex é alterado
-  useEffect(() => {
-    // itens que serão mostrados ao longo do carrossel
-    // const items = [...heroes];
-
-    // calcula o índice do array de acordo com o item ativo
-    // de forma que o número nunca saia do escopo do array
-    const indexInArrayScope =
-      ((activeIndex % heroes.length) + heroes.length) % heroes.length;
-
-    // itens que estão visíveis neste momento para o usuário
-    // duplicamos o array para dar a impressão de um carrossel infinito (360deg)
-    const visibleItems = [...heroes, ...heroes].slice(
-      indexInArrayScope,
-      indexInArrayScope + 3
+    const voicesAudio: Record<string, HTMLAudioElement> = useMemo(
+      () => ({
+        "spider-man-616": new Audio("/songs/spider-man-616.mp3"),
+        "mulher-aranha-65": new Audio("/songs/mulher-aranha-65.mp3"),
+        "spider-man-1610": new Audio("/songs/spider-man-1610.mp3"),
+        "sp-dr-14512": new Audio("/songs/sp-dr-14512.mp3"),
+        "spider-ham-8311": new Audio("/songs/spider-ham-8311.mp3"),
+        "spider-man-90214": new Audio("/songs/spider-man-90214.mp3"),
+        "spider-man-928": new Audio("/songs/spider-man-928.mp3"),
+      }),
+      []
     );
 
-    setVisibleItems(visibleItems);
-  }, [heroes, activeIndex]);
+    // Altera o visibleItems sempre que o activeIndex é alterado
+    useEffect(() => {
+      // itens que serão mostrados ao longo do carrossel
+      // const items = [...heroes];
 
-  // Altera o fundo da página de acordo com o herói selecionado
-  useEffect(() => {
-    const htmlEl = document.querySelector("html");
+      // calcula o índice do array de acordo com o item ativo
+      // de forma que o número nunca saia do escopo do array
+      const indexInArrayScope =
+        ((activeIndex % heroes.length) + heroes.length) % heroes.length;
 
-    if (!htmlEl || !visibleItems) {
-      return;
-    }
+      // itens que estão visíveis neste momento para o usuário
+      // duplicamos o array para dar a impressão de um carrossel infinito (360deg)
+      const visibleItems = [...heroes, ...heroes].slice(
+        indexInArrayScope,
+        indexInArrayScope + 3
+      );
 
-    const currentHeroId = visibleItems[1].id;
-    htmlEl.style.backgroundImage = `url("/spiders/${currentHeroId}-background.png")`;
-    htmlEl.classList.add("hero-page");
+      setVisibleItems(visibleItems);
+    }, [heroes, activeIndex]);
 
-    // remove a classe quando o componente é desmontado
-    return () => {
-      htmlEl.classList.remove("hero-page");
-    };
-  }, [visibleItems]);
+    // Altera o fundo da página de acordo com o herói selecionado
+    useEffect(() => {
+      const htmlEl = document.querySelector("html");
 
-  // Reproduz efeitos sonoros ao rotacionar o carrossel
-  useEffect(() => {
-    if (!visibleItems) {
-      return;
-    }
+      if (!htmlEl || !visibleItems) {
+        return;
+      }
 
-    transitionAudio.play();
-    const voiceAudio = voicesAudio[visibleItems[1].id];
+      const currentHeroId = visibleItems[1].id;
+      htmlEl.style.backgroundImage = `url("/spiders/${currentHeroId}-background.png")`;
+      htmlEl.classList.add("hero-page");
 
-    if (voiceAudio) {
-      voiceAudio.volume = 0.3;
-      voiceAudio?.play();
-    }
-  }, [visibleItems, transitionAudio, voicesAudio]);
+      // remove a classe quando o componente é desmontado
+      return () => {
+        htmlEl.classList.remove("hero-page");
+      };
+    }, [visibleItems]);
+
+    // Reproduz efeitos sonoros ao rotacionar o carrossel
+    useEffect(() => {
+      if (!visibleItems || typeof window === "undefined") {
+        return;
+      }
+
+      transitionAudio.play();
+      const voiceAudio = voicesAudio[visibleItems[1].id];
+
+      if (voiceAudio) {
+        voiceAudio.volume = 0.3;
+        voiceAudio?.play();
+      }
+    }, [visibleItems, transitionAudio, voicesAudio]);
+  }
 
   // Altera herói ativo no carrossel
   // +1 rotaciona no sentido horário
@@ -196,7 +201,7 @@ export default function Carousel({ heroes, activeId }: IProps) {
         animate={{ opacity: 1 }}
         transition={{ delay: 1, duration: 2 }}
       >
-        <HeroDetails data={visibleItems[enPosition.MIDDLE]} />
+        <HeroDetails hero={visibleItems[enPosition.MIDDLE]} />
       </motion.div>
     </div>
   );

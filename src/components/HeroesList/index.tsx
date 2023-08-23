@@ -23,7 +23,7 @@ export default function HeroesList({ heroes }: IProps) {
         animate={{ opacity: 1 }}
         transition={{ delay: 2, duration: 2 }}
       >
-        Personagens
+        Characters
       </motion.h1>
       <motion.section
         className={styles.heroes}

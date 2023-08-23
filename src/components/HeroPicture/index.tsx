@@ -26,10 +26,14 @@ interface IProps {
 
 export default function HeroPicture({ hero }: IProps) {
   return (
-    <Image
-      src={heroesImage[hero.id] || ImageSpiderMan616}
-      alt={`${hero.name} (Universo-${hero.universe})` || ""}
-      priority
-    />
+    <>
+      <Image
+        src={heroesImage[hero.id] || ImageSpiderMan616}
+        alt={`${hero?.name ? `${hero.name} ` : ""}(Universo-${
+          hero?.universe || "Desconhecido"
+        })`}
+        priority
+      />
+    </>
   );
 }
