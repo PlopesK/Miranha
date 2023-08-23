@@ -43,7 +43,7 @@
       "fullName": "Peni Parker",
       "birthday": "2009-10-22",
       "homeland": "New York City, Nova York",
-      "height": 1.5,
+      "height": 1.50,
       "weight": 47.6
     }
   },
@@ -53,7 +53,7 @@
     "universe": 8311,
     "details": {
       "fullName": "Peter Porker",
-      "birthday": "Unknown",
+      "birthday": null,
       "homeland": "Queens, Nova York",
       "height": 1.57,
       "weight": 43.9

@@ -3,9 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Spiderverse",
+  title: "Spider-Verse",
   description:
-    "Creating a parallax carousel about Spiderverse with React, Next.js 13 and Framer Motion",
+    "Criando um carrossel parallax do Aranhaverso com React, Next.js 13 e Framer Motion",
 };
 
 export default function RootLayout({
@@ -22,7 +22,6 @@ export default function RootLayout({
             alt="Menu options"
             width={36}
             height={25}
-            priority
           />
           <Link href="/">
             <Image
@@ -30,16 +29,9 @@ export default function RootLayout({
               alt="Spiderman"
               width={260}
               height={70}
-              priority
             />
           </Link>
-          <Image
-            src="/icons/user.svg"
-            alt="Login"
-            width={36}
-            height={36}
-            priority
-          />
+          <Image src="/icons/user.svg" alt="Login" width={36} height={36} />
         </header>
         {children}
       </body>

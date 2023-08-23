@@ -32,3 +32,11 @@ header {
   position: relative;
   z-index: 4;
 }
+
+::selection {
+  background: transparent;
+}
+
+::-moz-selection {
+  background: transparent;
+}
